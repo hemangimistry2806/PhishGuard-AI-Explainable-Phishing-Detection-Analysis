@@ -1,0 +1,13 @@
+venv/
+__pycache__/
+.ipynb_checkpoints/
+
+node_modules/
+
+*.pyc
+.env
+.env.*
+
+ml/models/*.pkl
+ml/models/*.joblib
+phish_data.csv
