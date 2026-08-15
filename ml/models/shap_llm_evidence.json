@@ -1,0 +1,56 @@
+{
+    "prediction": "Phishing",
+    "phishing_probability": 0.9999977350234985,
+    "top_features": [
+        {
+            "Feature": "URLSimilarityIndex",
+            "SHAP Value": 9.221220970153809,
+            "Feature Value": 100.0
+        },
+        {
+            "Feature": "NoOfSelfRef",
+            "SHAP Value": 0.81537926197052,
+            "Feature Value": 119.0
+        },
+        {
+            "Feature": "NoOfImage",
+            "SHAP Value": 0.6637913584709167,
+            "Feature Value": 34.0
+        },
+        {
+            "Feature": "LineOfCode",
+            "SHAP Value": 0.4491221010684967,
+            "Feature Value": 558.0
+        },
+        {
+            "Feature": "NoOfJS",
+            "SHAP Value": 0.3792590796947479,
+            "Feature Value": 28.0
+        },
+        {
+            "Feature": "NoOfCSS",
+            "SHAP Value": 0.2874261736869812,
+            "Feature Value": 20.0
+        },
+        {
+            "Feature": "URLCharProb",
+            "SHAP Value": 0.2782759368419647,
+            "Feature Value": 0.061933179
+        },
+        {
+            "Feature": "LetterRatioInURL",
+            "SHAP Value": -0.22271820902824402,
+            "Feature Value": 0.581
+        },
+        {
+            "Feature": "SpacialCharRatioInURL",
+            "SHAP Value": 0.1979997754096985,
+            "Feature Value": 0.032
+        },
+        {
+            "Feature": "NoOfExternalRef",
+            "SHAP Value": 0.19639922678470612,
+            "Feature Value": 124.0
+        }
+    ]
+}
