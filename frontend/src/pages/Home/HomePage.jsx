@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef } from "react";
 import Swal from "sweetalert2";
 import { ShieldCheck } from "lucide-react";
 import PageHeader from "../../components/common/PageHeader.jsx";
@@ -43,13 +43,16 @@ export default function HomePage() {
   const [loading, setLoading] = useState(false);
   const [explaining, setExplaining] = useState(false);
   const [stage, setStage] = useState("Analyzing URL...");
+  const [inlineStatus, setInlineStatus] = useState(null);
 
+  const resultRef = useRef(null);
   const sampleCount = useMemo(() => SAMPLES.length, []);
 
   function handleUrlChange(newUrl) {
     setUrl(newUrl);
     setPrediction(null);
     setExplanation(null);
+    setInlineStatus(null);
 
     const match = findMatchingSample(newUrl);
     setSelectedSample(match);
@@ -60,6 +63,7 @@ export default function HomePage() {
     setSelectedSample(null);
     setPrediction(null);
     setExplanation(null);
+    setInlineStatus(null);
   }
 
   function selectSample(sample) {
@@ -67,6 +71,10 @@ export default function HomePage() {
     setUrl(sample.url);
     setPrediction(null);
     setExplanation(null);
+    setInlineStatus({
+      type: "info",
+      message: `Selected benchmark sample: ${sample.label} (${sample.url})`,
+    });
   }
 
   async function analyze() {
@@ -97,6 +105,7 @@ export default function HomePage() {
     setStage("Analyzing URL...");
     setPrediction(null);
     setExplanation(null);
+    setInlineStatus(null);
 
     try {
       let result;
@@ -108,6 +117,10 @@ export default function HomePage() {
           throw new Error("The backend returned an unexpected prediction response.");
         }
         setPrediction(result);
+        setInlineStatus({
+          type: "success",
+          message: `Benchmark evaluation completed: Classified as ${result.label} using verified 50 features.`,
+        });
       } else {
         // Live path: backend fetches the page and extracts features
         setStage("Fetching page and extracting features...");
@@ -121,31 +134,26 @@ export default function HomePage() {
         if (result.shap_features && result.shap_features.length > 0) {
           setExplanation(result);
         }
-        // Surface warnings about approximation
+
         if (result.warnings && result.warnings.length > 0) {
-          const note = result.fetch_error
-            ? "⚠️ Page fetch failed — HTML features defaulted to 0. Prediction accuracy may be reduced."
-            : "⚠️ Live analysis features (such as URLSimilarityIndex) are approximated. Live predictions may produce false positives. See details below.";
-          console.info("[PhishGuard] Feature extraction warnings:", result.warnings);
-          await Swal.fire({
-            icon: result.fetch_error ? "warning" : "info",
-            title: "Analysis Complete (with disclosures)",
-            text: note,
-            timer: 4000,
-            showConfirmButton: true,
+          setInlineStatus({
+            type: "warning",
+            message: result.fetch_error
+              ? "Live analysis completed with fetch notes. HTML features defaulted to 0."
+              : "Live analysis completed. Note: URLSimilarityIndex is approximated on external URLs.",
           });
-          return;
+        } else {
+          setInlineStatus({
+            type: "success",
+            message: `Live analysis completed: Classified as ${result.label}.`,
+          });
         }
       }
-
-      await Swal.fire({
-        icon: "success",
-        title: "Analysis Complete",
-        text: "The phishing analysis was completed successfully.",
-        timer: 1500,
-        showConfirmButton: false,
-      });
     } catch (error) {
+      setInlineStatus({
+        type: "error",
+        message: error.message || "Analysis failed.",
+      });
       await Swal.fire({ icon: "error", title: "Analysis Failed", text: error.message });
     } finally {
       setLoading(false);
@@ -164,12 +172,9 @@ export default function HomePage() {
     try {
       const result = await api.explain(matched.url, matched.features);
       setExplanation(result);
-      await Swal.fire({
-        icon: "success",
-        title: "Explanation Ready",
-        text: "The SHAP explanation was generated successfully.",
-        timer: 1300,
-        showConfirmButton: false,
+      setInlineStatus({
+        type: "success",
+        message: "SHAP feature importance calculated successfully.",
       });
     } catch (error) {
       await Swal.fire({ icon: "error", title: "Explanation Failed", text: error.message });
@@ -178,22 +183,20 @@ export default function HomePage() {
     }
   }
 
-
   return (
     <div className="page-stack">
       <PageHeader
-        eyebrow="Live backend integration"
-        title="Analyze phishing risk with explainable AI"
-        description="Type or paste any URL to run live feature extraction and phishing analysis. Choose a verified dataset sample for instant benchmark results."
+        eyebrow="Explainable AI Security"
+        title="Analyze Phishing Risk"
+        description="Analyze any URL using live feature extraction and SHAP explainability, or benchmark against verified dataset samples."
       >
         <div className="success-chip">
           <ShieldCheck size={16} />
-          <span>{sampleCount} verified samples</span>
+          <span>{sampleCount} benchmark samples</span>
         </div>
       </PageHeader>
 
-      <div className="analysis-grid">
-        <SampleSelector samples={SAMPLES} selectedSample={selectedSample} onSelect={selectSample} />
+      <div className="analyze-main-stack">
         <AnalysisForm
           url={url}
           onUrlChange={handleUrlChange}
@@ -202,16 +205,25 @@ export default function HomePage() {
           onAnalyze={analyze}
           loading={loading}
           stage={stage}
+          inlineStatus={inlineStatus}
+        />
+
+        <div ref={resultRef}>
+          <PredictionResult
+            result={prediction}
+            sample={selectedSample || { url }}
+            explanation={explanation}
+            onExplain={explain}
+            explaining={explaining}
+          />
+        </div>
+
+        <SampleSelector
+          samples={SAMPLES}
+          selectedSample={selectedSample}
+          onSelect={selectSample}
         />
       </div>
-
-      <PredictionResult
-        result={prediction}
-        sample={selectedSample || { url }}
-        explanation={explanation}
-        onExplain={explain}
-        explaining={explaining}
-      />
     </div>
   );
 }

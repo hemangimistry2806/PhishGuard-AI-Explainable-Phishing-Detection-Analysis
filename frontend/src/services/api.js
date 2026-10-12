@@ -75,5 +75,8 @@ export const api = {
   getFeedbackStats() {
     return request("/feedback/stats");
   },
+  checkHealth() {
+    return request("/");
+  },
 };
 

@@ -87,17 +87,24 @@ export default function FeedbackPage() {
         </form>
         <section className="panel">
           <div className="section-title">
-            <span><MessageSquare size={17} /> Feedback status</span>
-            <small>Backend backed</small>
+            <span><MessageSquare size={17} /> Evaluation summary</span>
+            <small>Live backend data</small>
           </div>
-          {stats ? (
+          {stats && stats.total_feedback > 0 ? (
             <div className="feedback-stats">
               <div><MessageSquare size={20} /><span>Total</span><strong>{stats.total_feedback}</strong></div>
               <div><ThumbsUp size={20} /><span>Correct</span><strong>{stats.correct_predictions}</strong></div>
               <div><ThumbsDown size={20} /><span>Incorrect</span><strong>{stats.incorrect_predictions}</strong></div>
+              <div><MessageSquare size={20} /><span>Accuracy</span><strong>{((stats.accuracy_rate || 0) * 100).toFixed(1)}%</strong></div>
             </div>
           ) : (
-            <EmptyState icon={MessageSquare} title="Feedback stats unavailable" text="The form can still submit when the backend is reachable." />
+            <div className="compact-empty-state">
+              <MessageSquare size={20} className="empty-state-icon" />
+              <div>
+                <h4>No feedback yet</h4>
+                <p>Submit your verdict on any URL prediction to record human feedback.</p>
+              </div>
+            </div>
           )}
         </section>
       </div>

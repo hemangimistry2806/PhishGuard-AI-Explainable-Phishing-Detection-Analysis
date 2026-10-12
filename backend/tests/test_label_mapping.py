@@ -77,6 +77,43 @@ class TestLabelAndProbabilityMapping:
         assert abs(result["phishing_probability"] - float(raw_probs[0])) < 1e-6
         assert abs(result["legitimate_probability"] - float(raw_probs[1])) < 1e-6
 
+    def test_all_frontend_benchmark_samples_match_predictions(self, service):
+        """
+        Verify that all 30 benchmark samples provided to the frontend UI
+        produce predictions and probabilities matching their expected labels.
+        Directly guards against the sample-result mismatch reported in UI recordings.
+        """
+        import json
+        samples_path = os.path.join(project_root, "frontend", "src", "data", "samples", "samples.js")
+        assert os.path.exists(samples_path), f"samples.js not found at {samples_path}"
+
+        with open(samples_path, "r", encoding="utf-8") as f:
+            text = f.read()
+
+        start = text.find("[")
+        end = text.rfind("]") + 1
+        samples = json.loads(text[start:end])
+        assert len(samples) >= 30, f"Expected at least 30 samples, found {len(samples)}"
+
+        for i, sample in enumerate(samples):
+            url = sample["url"]
+            expected_label = sample["label"]
+            features = sample["features"]
+            assert len(features) == 50, f"Sample {url} has {len(features)} features, expected 50"
+
+            res = service.predict(features)
+            assert res["label"] == expected_label, (
+                f"Sample #{i} ({url}) expected {expected_label} but model predicted {res['label']} "
+                f"(prediction={res['prediction']}, phish_prob={res['phishing_probability']:.4f})"
+            )
+
+            if expected_label == "Phishing":
+                assert res["prediction"] == 0
+                assert res["phishing_probability"] > 0.5
+            else:
+                assert res["prediction"] == 1
+                assert res["legitimate_probability"] > 0.5
+
 
 class TestAPILabelEndpointIntegration:
     """Integration test verifying HTTP endpoints return the corrected mapping."""
