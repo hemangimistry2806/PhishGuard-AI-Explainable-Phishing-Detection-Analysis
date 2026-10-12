@@ -525,6 +525,44 @@ textarea {
   background: var(--success);
 }
 
+.warning-notice-card {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid rgba(247, 200, 115, 0.4);
+  border-radius: var(--radius);
+  background: rgba(247, 200, 115, 0.08);
+  color: var(--text);
+}
+
+.warning-notice-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--warning);
+  font-size: 0.95rem;
+}
+
+.warning-notice-list {
+  margin: 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 6px;
+  color: var(--muted-strong);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.warning-notice-disclaimer {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+  font-style: italic;
+  line-height: 1.5;
+  border-top: 1px dashed rgba(247, 200, 115, 0.25);
+  padding-top: 8px;
+}
+
 .result-actions {
   display: flex;
   justify-content: flex-end;

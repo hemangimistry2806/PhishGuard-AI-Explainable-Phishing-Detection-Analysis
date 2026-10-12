@@ -124,14 +124,14 @@ export default function HomePage() {
         // Surface warnings about approximation
         if (result.warnings && result.warnings.length > 0) {
           const note = result.fetch_error
-            ? "⚠️ Page fetch failed — HTML features defaulted to 0. Accuracy may be reduced."
-            : "ℹ️ Some features were approximated (see console for details).";
+            ? "⚠️ Page fetch failed — HTML features defaulted to 0. Prediction accuracy may be reduced."
+            : "⚠️ Live analysis features (such as URLSimilarityIndex) are approximated. Live predictions may produce false positives. See details below.";
           console.info("[PhishGuard] Feature extraction warnings:", result.warnings);
           await Swal.fire({
             icon: result.fetch_error ? "warning" : "info",
-            title: "Analysis Complete (with notes)",
+            title: "Analysis Complete (with disclosures)",
             text: note,
-            timer: 3500,
+            timer: 4000,
             showConfirmButton: true,
           });
           return;

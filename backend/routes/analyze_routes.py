@@ -67,8 +67,8 @@ class SHAPFeature(BaseModel):
 
 class AnalyzeResponse(BaseModel):
     url: str
-    prediction: int
-    label: str
+    prediction: int          # 0 = Phishing, 1 = Legitimate (matches model.classes_ and dataset label)
+    label: str               # "Legitimate" | "Phishing"
     phishing_probability: float
     legitimate_probability: float
     # Extracted feature vector sent to the model (for transparency)

@@ -47,15 +47,17 @@ class PredictionService:
         # Phishing aur legitimate dono ki probability nikal rahe hain
         probabilities = self.model.predict_proba(X)[0]
 
-        # Class 1 = Phishing aur Class 0 = Legitimate
-        phishing_probability = float(probabilities[1])
-        legitimate_probability = float(probabilities[0])
+        # PhiUSIIL dataset and trained XGBoost model:
+        # Class 0 = Phishing, Class 1 = Legitimate (model.classes_ == [0, 1])
+        phishing_probability = float(probabilities[0])
+        legitimate_probability = float(probabilities[1])
 
-        # Prediction ko human-readable label mein convert kar rahe hain
+        # Prediction ko human-readable label mein convert kar rahe hain:
+        # 1 = Legitimate, 0 = Phishing
         if prediction == 1:
-            label = "Phishing"
-        else:
             label = "Legitimate"
+        else:
+            label = "Phishing"
 
         # Final result dictionary ke form mein return kar rahe hain
         return {

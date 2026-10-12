@@ -40,7 +40,7 @@ class PredictionRequest(BaseFeatureRequest):
 
 
 class PredictionResponse(BaseModel):
-    prediction: int          # 0 = Legitimate, 1 = Phishing
+    prediction: int          # 0 = Phishing, 1 = Legitimate (matches model.classes_ and dataset label)
     label: str               # "Legitimate" | "Phishing"
     phishing_probability: float
     legitimate_probability: float

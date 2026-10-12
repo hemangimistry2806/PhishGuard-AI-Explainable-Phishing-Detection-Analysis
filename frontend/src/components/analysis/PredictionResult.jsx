@@ -9,7 +9,7 @@ function pct(value) {
 export default function PredictionResult({ result, sample, explanation, onExplain, explaining }) {
   if (!result) return null;
 
-  const isPhishing = result.label === "Phishing" || result.prediction === 1;
+  const isPhishing = result.label ? result.label.toLowerCase() === "phishing" : result.prediction === 0;
 
   return (
     <motion.section
@@ -42,6 +42,23 @@ export default function PredictionResult({ result, sample, explanation, onExplai
           <div className="meter"><span className="meter-success" style={{ width: pct(result.legitimate_probability) }} /></div>
         </div>
       </div>
+
+      {result.warnings && result.warnings.length > 0 ? (
+        <div className="warning-notice-card" role="alert">
+          <div className="warning-notice-header">
+            <AlertTriangle size={18} />
+            <strong>Live Analysis Warnings & Disclosures</strong>
+          </div>
+          <ul className="warning-notice-list">
+            {result.warnings.map((w, idx) => (
+              <li key={idx}>{w}</li>
+            ))}
+          </ul>
+          <p className="warning-notice-disclaimer">
+            Notice: URLSimilarityIndex is approximated. Offline dataset benchmark accuracy does not guarantee real-world accuracy on unseen URLs, and live predictions may produce false positives.
+          </p>
+        </div>
+      ) : null}
 
       <div className="result-actions">
         <Button icon={ShieldQuestion} loading={explaining} onClick={onExplain}>

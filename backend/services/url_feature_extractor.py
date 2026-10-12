@@ -503,6 +503,9 @@ def extract_features(url: str, timeout: float = 8.0) -> Dict[str, Any]:
     scheme: str = url_feats.pop("_scheme")
     parsed_url: urllib.parse.ParseResult = url_feats.pop("_parsed_url")
 
+    warnings.append(
+        "URLSimilarityIndex is approximated using character overlap; live predictions may produce false positives."
+    )
     if url_feats["IsDomainIP"]:
         warnings.append("Hostname is an IP address; TLD-based features are approximated.")
     if url_feats["TLDLegitimateProb"] == _DEFAULT_TLD_LEGIT_PROB:
