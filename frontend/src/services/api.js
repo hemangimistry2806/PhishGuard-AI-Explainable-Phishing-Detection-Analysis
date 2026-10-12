@@ -53,6 +53,19 @@ export const api = {
       body: JSON.stringify({ url, features }),
     });
   },
+  /**
+   * Analyze any raw URL end-to-end.
+   * The backend extracts features by fetching the page, then runs XGBoost + SHAP.
+   * Works for arbitrary URLs, not only dataset benchmark samples.
+   * @param {string} url - The URL to analyze
+   * @param {boolean} includeExplanation - Whether to include SHAP/LLM explanation
+   */
+  analyzeUrl(url, includeExplanation = true) {
+    return request("/analyze/", {
+      method: "POST",
+      body: JSON.stringify({ url, include_explanation: includeExplanation }),
+    });
+  },
   submitFeedback(url, model_prediction, user_verdict, comment = "") {
     return request("/feedback/", {
       method: "POST",
@@ -63,3 +76,4 @@ export const api = {
     return request("/feedback/stats");
   },
 };
+

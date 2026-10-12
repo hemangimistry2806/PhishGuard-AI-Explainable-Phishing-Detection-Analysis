@@ -92,21 +92,6 @@ export default function HomePage() {
     }
 
     const matched = selectedSample || findMatchingSample(trimmed);
-    if (!matched || !isValidSample(matched)) {
-      await Swal.fire({
-        icon: "info",
-        title: "Dataset Feature Vector Required",
-        html: `
-          <div style="text-align: left; font-size: 0.92rem; line-height: 1.5;">
-            <p><strong>PhiUSIIL 50-Feature Mode:</strong></p>
-            <p>The ML model accepts pre-extracted 50-dimensional feature vectors from the PhiUSIIL dataset benchmark.</p>
-            <p>The entered URL <code>${trimmed}</code> does not yet have pre-computed dataset features loaded.</p>
-            <p style="margin-top: 8px;">Please select or type one of the <strong>${sampleCount} verified dataset URLs</strong> below (such as <code>http://www.teramill.com</code>, <code>http://www.f0519141.xsph.ru</code>, or <code>https://www.uni-mainz.de</code>).</p>
-          </div>
-        `,
-      });
-      return;
-    }
 
     setLoading(true);
     setStage("Analyzing URL...");
@@ -114,11 +99,45 @@ export default function HomePage() {
     setExplanation(null);
 
     try {
-      const result = await api.predict(matched.features);
-      if (typeof result.prediction !== "number" || !result.label) {
-        throw new Error("The backend returned an unexpected prediction response.");
+      let result;
+
+      if (matched && isValidSample(matched)) {
+        // Fast path: use pre-extracted dataset features (no page fetch needed)
+        result = await api.predict(matched.features);
+        if (typeof result.prediction !== "number" || !result.label) {
+          throw new Error("The backend returned an unexpected prediction response.");
+        }
+        setPrediction(result);
+      } else {
+        // Live path: backend fetches the page and extracts features
+        setStage("Fetching page and extracting features...");
+        result = await api.analyzeUrl(trimmed, true);
+        if (typeof result.prediction !== "number" || !result.label) {
+          throw new Error("The backend returned an unexpected analysis response.");
+        }
+        // Store the full /analyze/ response (includes shap_features, warnings, etc.)
+        setPrediction(result);
+        // If SHAP was included in the response, store explanation immediately
+        if (result.shap_features && result.shap_features.length > 0) {
+          setExplanation(result);
+        }
+        // Surface warnings about approximation
+        if (result.warnings && result.warnings.length > 0) {
+          const note = result.fetch_error
+            ? "⚠️ Page fetch failed — HTML features defaulted to 0. Accuracy may be reduced."
+            : "ℹ️ Some features were approximated (see console for details).";
+          console.info("[PhishGuard] Feature extraction warnings:", result.warnings);
+          await Swal.fire({
+            icon: result.fetch_error ? "warning" : "info",
+            title: "Analysis Complete (with notes)",
+            text: note,
+            timer: 3500,
+            showConfirmButton: true,
+          });
+          return;
+        }
       }
-      setPrediction(result);
+
       await Swal.fire({
         icon: "success",
         title: "Analysis Complete",
@@ -135,6 +154,10 @@ export default function HomePage() {
 
   async function explain() {
     const matched = selectedSample || findMatchingSample(url);
+
+    // If we already have explanation from /analyze/ response, skip re-fetch
+    if (explanation && explanation.shap_features) return;
+
     if (!prediction || !matched || !isValidSample(matched)) return;
     setExplaining(true);
     setStage("Generating explanation...");
@@ -155,12 +178,13 @@ export default function HomePage() {
     }
   }
 
+
   return (
     <div className="page-stack">
       <PageHeader
         eyebrow="Live backend integration"
         title="Analyze phishing risk with explainable AI"
-        description="Type or paste any URL or choose a verified sample to send its 50-feature vector to the finalized FastAPI backend."
+        description="Type or paste any URL to run live feature extraction and phishing analysis. Choose a verified dataset sample for instant benchmark results."
       >
         <div className="success-chip">
           <ShieldCheck size={16} />

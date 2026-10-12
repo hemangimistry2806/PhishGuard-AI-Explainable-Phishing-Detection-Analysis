@@ -12,3 +12,7 @@ scikit-learn==1.5.2
 
 # LLM
 openai==1.47.0
+
+# URL Feature Extraction (url_feature_extractor.py)
+requests==2.32.5
+beautifulsoup4==4.14.3
