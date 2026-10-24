@@ -100,8 +100,10 @@ def explain(request: ExplanationRequest) -> ExplanationResponse:
     llm_text: Optional[str] = None
     if _llm_service is not None:
         try:
+            from database import sanitize_url
+            safe_llm_url = sanitize_url(request.url)
             llm_text = _llm_service.generate_explanation(
-                url=request.url,
+                url=safe_llm_url,
                 prediction=pred_result["label"],
                 shap_features=shap_features,
             )

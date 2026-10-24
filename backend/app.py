@@ -24,14 +24,16 @@ load_dotenv(
 # Application factory
 # ---------------------------------------------------------------------------
 
+from database import init_db
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Services (PredictionService, SHAPService, LLMService) are instantiated
-    # once at import time via services/dependencies.py — not lazily per request.
-    # If model loading fails (e.g. wrong path), the error surfaces here at startup.
-    print("PhishGuard AI backend started.")
+    init_db()
+    print("PhishGuard AI backend started, database initialized.")
     yield
     print("PhishGuard AI backend shutting down.")
+
 
 
 app = FastAPI(
@@ -74,8 +76,27 @@ app.include_router(analyze_router)
 # Health check
 # ---------------------------------------------------------------------------
 @app.get("/", tags=["Health"])
+@app.get("/health", tags=["Health"])
 def health_check():
     return {"status": "ok", "service": "PhishGuard AI"}
+
+
+@app.get("/model/evaluation", tags=["Evaluation"])
+def get_model_evaluation():
+    import json
+    report_path = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "reports",
+        "model_evaluation_report.json"
+    )
+    if os.path.exists(report_path):
+        try:
+            with open(report_path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception as e:
+            return {"status": "Error", "message": str(e)}
+    return {"status": "Not run", "message": "Evaluation report pending."}
+
 
 
 # ---------------------------------------------------------------------------

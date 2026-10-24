@@ -22,6 +22,7 @@ These limitations are surfaced to the caller via the `warnings` and
 """
 
 import logging
+import uuid
 from typing import List, Optional
 
 from fastapi import APIRouter, HTTPException
@@ -66,7 +67,9 @@ class SHAPFeature(BaseModel):
 
 
 class AnalyzeResponse(BaseModel):
+    analysis_id: str
     url: str
+    registered_domain: Optional[str] = None
     prediction: int          # 0 = Phishing, 1 = Legitimate (matches model.classes_ and dataset label)
     label: str               # "Legitimate" | "Phishing"
     phishing_probability: float
@@ -79,6 +82,7 @@ class AnalyzeResponse(BaseModel):
     # Honest reporting of approximation issues
     fetch_error: Optional[str]
     warnings: List[str]
+
 
 
 # ---------------------------------------------------------------------------
@@ -140,11 +144,13 @@ def analyze_url(request: AnalyzeRequest) -> AnalyzeResponse:
             logger.warning("SHAP explanation failed: %s", exc)
             warnings.append(f"SHAP explanation could not be generated: {str(exc)}")
 
-        # 4. LLM explanation (optional, non-fatal)
+        # 4. LLM natural-language explanation (optional, non-fatal)
         if _llm_service is not None and shap_feats is not None:
             try:
+                from database import sanitize_url
+                safe_llm_url = sanitize_url(request.url)
                 llm_text = _llm_service.generate_explanation(
-                    url=request.url,
+                    url=safe_llm_url,
                     prediction=pred_result["label"],
                     shap_features=[{"feature": f.feature, "shap_value": f.shap_value}
                                    for f in shap_feats],
@@ -152,8 +158,13 @@ def analyze_url(request: AnalyzeRequest) -> AnalyzeResponse:
             except Exception as exc:
                 llm_text = f"[LLM explanation unavailable: {str(exc)[:120]}]"
 
+    analysis_id = "anlz-" + uuid.uuid4().hex[:10]
+    reg_domain = feature_dict.get("_registered_domain")
+
     return AnalyzeResponse(
+        analysis_id=analysis_id,
         url=request.url,
+        registered_domain=reg_domain,
         prediction=pred_result["prediction"],
         label=pred_result["label"],
         phishing_probability=pred_result["phishing_probability"],

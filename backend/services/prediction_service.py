@@ -13,14 +13,17 @@ class PredictionService:
             )
         )
 
-        # Trained XGBoost model ka path bana rahe hain
-        # Model location: project_root/ml/models/xgboost_model.pkl
-        model_path = os.path.join(
-            base_dir,
-            "ml",
-            "models",
-            "xgboost_model.pkl"
-        )
+        # Trained XGBoost model path with MODEL_PATH environment variable support
+        env_model_path = os.getenv("MODEL_PATH")
+        if env_model_path and os.path.exists(env_model_path):
+            model_path = env_model_path
+        else:
+            model_path = os.path.join(
+                base_dir,
+                "ml",
+                "models",
+                "xgboost_model.pkl"
+            )
 
         # Saved XGBoost model ko load kar rahe hain
         with open(model_path, "rb") as file:

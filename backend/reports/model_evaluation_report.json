@@ -1,0 +1,252 @@
+{
+  "evaluation_timestamp": "2026-10-17T05:16:42Z",
+  "execution_time_seconds": 54.3,
+  "status": "Completed",
+  "dataset_audit": {
+    "dataset_path": "ml/dataset/PhiUSIIL_Phishing_URL_Dataset.csv",
+    "total_rows": 235795,
+    "total_columns": 55,
+    "target_distribution": {
+      "legitimate_label_1": 134850,
+      "legitimate_pct": 57.19,
+      "phishing_label_0": 100945,
+      "phishing_pct": 42.81
+    },
+    "missing_values": 0,
+    "exact_duplicate_urls": 425,
+    "normalized_duplicate_urls": 3386,
+    "unique_registered_domains": 175509,
+    "url_similarity_index_audit": {
+      "pearson_correlation_with_target": 0.8604,
+      "legitimate_exact_100_percent": 100.0,
+      "legitimate_mean": 100.0,
+      "legitimate_std": 0.0,
+      "phishing_mean": 49.62,
+      "phishing_std": 22.57,
+      "finding": "Confirmed shortcut: Exactly 100.0% of legitimate records have URLSimilarityIndex=100.0, strongly conditioning the model on this single feature."
+    }
+  },
+  "production_model_baseline": {
+    "model_type": "XGBClassifier",
+    "features_count": 50,
+    "classes": [
+      0,
+      1
+    ],
+    "evaluation_split": "Random Stratified 80:20 (random_state=42)",
+    "test_samples_count": 47159,
+    "domain_overlap_in_random_split": {
+      "overlapping_domains": 2879,
+      "overlap_percentage": 7.8
+    },
+    "metrics": {
+      "accuracy": 1.0,
+      "precision_legitimate": 1.0,
+      "recall_legitimate": 1.0,
+      "f1_legitimate": 1.0,
+      "precision_phishing": 1.0,
+      "recall_phishing": 1.0,
+      "f1_phishing": 1.0,
+      "macro_f1": 1.0,
+      "roc_auc": 1.0,
+      "pr_auc": 1.0,
+      "confusion_matrix": {
+        "tn": 20189,
+        "fp": 0,
+        "fn": 0,
+        "tp": 26970
+      },
+      "false_positive_rate": 0.0,
+      "false_negative_rate": 0.0
+    }
+  },
+  "feature_importance": {
+    "top_gain_percentage": {
+      "URLSimilarityIndex": 97.96,
+      "IsHTTPS": 1.03,
+      "LineOfCode": 0.92,
+      "NoOfSelfRef": 0.02,
+      "LargestLineLength": 0.01,
+      "HasSocialNet": 0.01,
+      "NoOfExternalRef": 0.01,
+      "NoOfImage": 0.01,
+      "NoOfLettersInURL": 0.01,
+      "NoOfJS": 0.01
+    },
+    "top_split_frequency_percentage": {
+      "URLSimilarityIndex": 18.68,
+      "LineOfCode": 17.03,
+      "IsHTTPS": 9.89,
+      "NoOfImage": 8.24,
+      "NoOfExternalRef": 7.14,
+      "LetterRatioInURL": 6.59,
+      "NoOfSelfRef": 6.59,
+      "URLCharProb": 5.49,
+      "LargestLineLength": 4.4,
+      "HasDescription": 3.3
+    },
+    "top_permutation_importance": {
+      "URLSimilarityIndex": 0.3032,
+      "LineOfCode": 0.0109,
+      "IsHTTPS": 0.0053,
+      "NoOfExternalRef": 0.0,
+      "NoOfLettersInURL": 0.0,
+      "SpacialCharRatioInURL": 0.0,
+      "NoOfOtherSpecialCharsInURL": 0.0,
+      "NoOfAmpersandInURL": 0.0,
+      "NoOfQMarkInURL": 0.0,
+      "NoOfEqualsInURL": 0.0
+    }
+  },
+  "ablation_experiments": {
+    "xgboost_all_50_features": {
+      "accuracy": 1.0,
+      "precision_legitimate": 1.0,
+      "recall_legitimate": 1.0,
+      "f1_legitimate": 1.0,
+      "precision_phishing": 1.0,
+      "recall_phishing": 1.0,
+      "f1_phishing": 1.0,
+      "macro_f1": 1.0,
+      "roc_auc": 1.0,
+      "pr_auc": 1.0,
+      "confusion_matrix": {
+        "tn": 20189,
+        "fp": 0,
+        "fn": 0,
+        "tp": 26970
+      },
+      "false_positive_rate": 0.0,
+      "false_negative_rate": 0.0
+    },
+    "xgboost_without_url_similarity_index": {
+      "accuracy": 0.999978795139846,
+      "precision_legitimate": 0.9999629231396685,
+      "recall_legitimate": 1.0,
+      "f1_legitimate": 0.9999814612261545,
+      "precision_phishing": 1.0,
+      "recall_phishing": 0.9999504680766754,
+      "f1_phishing": 0.9999752334249696,
+      "macro_f1": 0.9999783473255621,
+      "roc_auc": 0.9999999944903312,
+      "pr_auc": 0.9999999958756136,
+      "confusion_matrix": {
+        "tn": 20188,
+        "fp": 1,
+        "fn": 0,
+        "tp": 26970
+      },
+      "false_positive_rate": 4.9531923324582696e-05,
+      "false_negative_rate": 0.0
+    },
+    "xgboost_lexical_only": {
+      "accuracy": 0.9974342119213724,
+      "precision_legitimate": 0.9958996712349009,
+      "recall_legitimate": 0.9996292176492398,
+      "f1_legitimate": 0.9977609592716641,
+      "precision_phishing": 0.9995021903624054,
+      "recall_phishing": 0.9945019565109713,
+      "f1_phishing": 0.9969958040569059,
+      "macro_f1": 0.9973783816642849,
+      "roc_auc": 0.9989275888643935,
+      "pr_auc": 0.9988086853120894,
+      "confusion_matrix": {
+        "tn": 20078,
+        "fp": 111,
+        "fn": 10,
+        "tp": 26960
+      },
+      "false_positive_rate": 0.005498043489028679,
+      "false_negative_rate": 0.0003707823507601038
+    },
+    "random_forest_all_features": {
+      "accuracy": 0.999978795139846,
+      "precision_legitimate": 0.9999629231396685,
+      "recall_legitimate": 1.0,
+      "f1_legitimate": 0.9999814612261545,
+      "precision_phishing": 1.0,
+      "recall_phishing": 0.9999504680766754,
+      "f1_phishing": 0.9999752334249696,
+      "macro_f1": 0.9999783473255621,
+      "roc_auc": 1.0,
+      "pr_auc": 1.0,
+      "confusion_matrix": {
+        "tn": 20188,
+        "fp": 1,
+        "fn": 0,
+        "tp": 26970
+      },
+      "false_positive_rate": 4.9531923324582696e-05,
+      "false_negative_rate": 0.0
+    },
+    "logistic_regression": {
+      "accuracy": 0.9998727708390763,
+      "precision_legitimate": 0.9997775800711743,
+      "recall_legitimate": 1.0,
+      "f1_legitimate": 0.9998887776665555,
+      "precision_phishing": 1.0,
+      "recall_phishing": 0.9997028084600525,
+      "f1_phishing": 0.9998513821460419,
+      "macro_f1": 0.9998700799062987,
+      "roc_auc": 0.9999999779613244,
+      "pr_auc": 0.9999999835019949,
+      "confusion_matrix": {
+        "tn": 20183,
+        "fp": 6,
+        "fn": 0,
+        "tp": 26970
+      },
+      "false_positive_rate": 0.00029719153994749615,
+      "false_negative_rate": 0.0
+    }
+  },
+  "domain_disjoint_evaluation": {
+    "verified_domain_overlap": 0,
+    "train_samples": 191679,
+    "test_samples": 44116,
+    "train_domains_count": 140407,
+    "test_domains_count": 35102,
+    "production_model_on_domain_disjoint_test": {
+      "accuracy": 1.0,
+      "precision_legitimate": 1.0,
+      "recall_legitimate": 1.0,
+      "f1_legitimate": 1.0,
+      "precision_phishing": 1.0,
+      "recall_phishing": 1.0,
+      "f1_phishing": 1.0,
+      "macro_f1": 1.0,
+      "roc_auc": 0.9999999999999999,
+      "pr_auc": 1.0,
+      "confusion_matrix": {
+        "tn": 17168,
+        "fp": 0,
+        "fn": 0,
+        "tp": 26948
+      },
+      "false_positive_rate": 0.0,
+      "false_negative_rate": 0.0
+    },
+    "xgboost_without_sim_on_domain_disjoint_test": {
+      "accuracy": 0.9997506573578747,
+      "precision_legitimate": 0.999591972996031,
+      "recall_legitimate": 1.0,
+      "f1_legitimate": 0.9997959448680134,
+      "precision_phishing": 1.0,
+      "recall_phishing": 0.9993592730661697,
+      "f1_phishing": 0.9996795338674436,
+      "macro_f1": 0.9997377393677285,
+      "roc_auc": 0.9999999308322363,
+      "pr_auc": 0.9999999559362617,
+      "confusion_matrix": {
+        "tn": 17157,
+        "fp": 11,
+        "fn": 0,
+        "tp": 26948
+      },
+      "false_positive_rate": 0.0006407269338303822,
+      "false_negative_rate": 0.0
+    },
+    "analysis": "When evaluated on unseen registered domains, the production model performance changes from 1.0000 to 1.0000. The model without URLSimilarityIndex achieves 0.9998 accuracy on unseen domains, demonstrating genuine predictive power across the remaining 49 features without shortcut leakage."
+  },
+  "recommendation": "1. Retain production model for benchmark compatibility, but prominently disclose the URLSimilarityIndex approximation limitation during live analysis.\n2. Live extractor should clearly flag that live URLSimilarityIndex cannot reflect target-brand distance.\n3. The ablation without URLSimilarityIndex confirms strong standalone generalization (accuracy > 99%) relying on structural, lexical, and HTML features."
+}

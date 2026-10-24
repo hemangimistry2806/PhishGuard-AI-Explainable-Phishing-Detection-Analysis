@@ -16,3 +16,8 @@ openai==1.47.0
 # URL Feature Extraction (url_feature_extractor.py)
 requests==2.32.5
 beautifulsoup4==4.14.3
+tldextract==5.3.0
+
+# Database Persistence
+sqlalchemy>=2.0.0
+

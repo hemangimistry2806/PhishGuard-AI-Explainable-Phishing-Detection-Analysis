@@ -40,10 +40,12 @@ class PredictionRequest(BaseFeatureRequest):
 
 
 class PredictionResponse(BaseModel):
+    analysis_id: str
     prediction: int          # 0 = Phishing, 1 = Legitimate (matches model.classes_ and dataset label)
     label: str               # "Legitimate" | "Phishing"
     phishing_probability: float
     legitimate_probability: float
+
 
 
 # ---------------------------------------------------------------------------
@@ -62,8 +64,11 @@ class PredictionResponse(BaseModel):
 )
 def predict(request: PredictionRequest) -> PredictionResponse:
     try:
+        import uuid
         result = prediction_service.predict(request.features)
+        result["analysis_id"] = "pred-" + uuid.uuid4().hex[:10]
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Prediction failed: {exc}")
 
     return PredictionResponse(**result)
+
