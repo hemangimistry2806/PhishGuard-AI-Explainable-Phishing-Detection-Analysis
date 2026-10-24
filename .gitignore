@@ -7,7 +7,16 @@ node_modules/
 *.pyc
 .env
 .env.*
+!.env.example
+!frontend/.env.example
+
+.vscode/
+*.db
+*.sqlite3
+backend/phishguard.db
+ml/models/feedback.json
 
 ml/models/*.pkl
 ml/models/*.joblib
 phish_data.csv
+cleaned_dataset.csv

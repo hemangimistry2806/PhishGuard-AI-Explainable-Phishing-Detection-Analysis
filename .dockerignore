@@ -1,0 +1,48 @@
+# Version control and editor
+.git
+.gitignore
+.github
+.vscode
+.idea
+
+# Python caches and virtual environments
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache
+.coverage
+htmlcov
+.venv
+venv
+env
+
+# Node and frontend artifacts
+node_modules
+frontend/node_modules
+frontend/dist
+
+# Datasets and heavy archive files (keep image lightweight)
+ml/dataset
+*.csv
+cleaned_dataset.csv
+PhiUSIIL_Phishing_URL_Dataset.csv
+*.tar.gz
+*.zip
+
+# Local SQLite databases (volume-managed in Docker)
+backend/phishguard.db
+*.db
+*.sqlite
+*.sqlite3
+
+# Local secrets and environment files
+.env
+.env.*
+!.env.example
+
+# Temporary agent logs and scratch files
+*.log
+scratch/
+.system_generated/
+DockerFiles/
